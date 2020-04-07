@@ -48,7 +48,7 @@ push () {
        exit 1
     fi
     git checkout $FROM_REMOTE/$BRANCH -b push-branch
-    git push $TO_REMOTE push-branch:$BRANCH
+    git push -f $TO_REMOTE push-branch:$BRANCH
     git checkout $BASE_BRANCH
     git branch -D push-branch
 }
