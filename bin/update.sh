@@ -39,7 +39,7 @@ push () {
     TO_REMOTE=$2
     BRANCH=$3
     if [ -n "$(git branch | grep push-branch)" ]; then
-        git checkout master
+        git checkout $BASE_BRANCH 
         git branch -D push-branch
     fi
     if [ -z "$FROM_REMOTE" -o -z "$TO_REMOTE" -o -z "$BRANCH" ] ; then
