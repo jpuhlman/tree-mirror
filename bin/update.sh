@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+set -x
 TOPDIR=`pwd`
 mkdir -p tree
 
