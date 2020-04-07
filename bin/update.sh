@@ -36,6 +36,10 @@ push () {
     FROM_REMOTE=$1
     TO_REMOTE=$2
     BRANCH=$3
+    if [ -n "$(git branch | grep push-branch)" ]; then
+        git checkout master
+        git branch -D push-branch
+    fi
     if [ -z "$FROM_REMOTE" -o -z "$TO_REMOTE" -o -z "$BRANCH" ] ; then
        echo "push failed to set all vars"
        echo "FROM_REMOTE=$FROM_REMOTE TO_REMOTE=$TO_REMOTE BRANCH=$BRANCH"
@@ -52,7 +56,9 @@ checkout_tree $BASE_TREE $BASE_BRANCH
 pushd $LOCAL_TREE
 add_remote_tree $TO_TREE $TO_REMOTE
 git fetch --all
-push origin $TO_REMOTE $BASE_BRANCH
+if [ "$AUTO_PUSH_BASE" != "0" ] ; then
+    push origin $TO_REMOTE $BASE_BRANCH
+fi
 if [ -n "$(ls $TOPDIR/conf/trees/ 2>/dev/null)" ] ; then
     for tree in $TOPDIR/conf/trees/*; do
         TREE=""
@@ -82,7 +88,23 @@ if [ -n "$(ls $TOPDIR/conf/trees/ 2>/dev/null)" ] ; then
         fi
         REMOTE=$(basename $TREE | sed s,\\.git,, | sed s,\\.,_,g)
         push $REMOTE $TO_REMOTE $BRANCH 
-    done
-    
+    done 
 fi
-
+if [ -n "$MANUAL_MERGE_BRANCHES" ] ; then
+   allBranches=$(git branch -a | grep -v HEAD | grep remotes\/origin | sed s,remotes\/origin/,,)
+   mergeBranches=""
+   for branch in $allBranches; do
+       current=$(echo $branch | sed s,\ ,,g)
+       for manual in $MANUAL_MERGE_BRANCHES; do
+           if [ "$manual" = "$current" ] ; then
+                current=""
+           fi
+       done
+       if [ -n "$current" ] ; then
+          mergeBranches="$mergeBranches $current"
+       fi
+   done
+   for branch in $mergeBranches; do
+       push origin github $branch
+   done
+fi
