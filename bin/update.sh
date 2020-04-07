@@ -13,7 +13,9 @@ checkout_tree () {
     TREE=$1
     BRANCH=$2
     REPO=$(basename $TREE | sed s,.git,,)
-
+    if [ "$REMOVE_TREE" = "1" ] ; then
+       rm $REPO -rf
+    fi
     if [ ! -e "$REPO"  ] ; then
         if [ "$BRANCH" = "master" ] ; then
             git clone $TREE
@@ -90,7 +92,7 @@ if [ -n "$(ls $TOPDIR/conf/trees/ 2>/dev/null)" ] ; then
         push $REMOTE $TO_REMOTE $BRANCH 
     done 
 fi
-if [ -n "$MANUAL_MERGE_BRANCHES" ] ; then
+if [ -n "$MANUAL_MERGE_BRANCHES" -o "$SYNC_ALL" = "1" ] ; then
    allBranches=$(git branch -a | grep -v HEAD | grep remotes\/origin | sed s,remotes\/origin/,,)
    mergeBranches=""
    for branch in $allBranches; do
