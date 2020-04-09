@@ -68,6 +68,7 @@ git fetch --all
 if [ -n "$MASTER_TO_NEXT" ] ; then
     if [ -z "$(git branch -a | grep remotes\/origin/$MASTER_TO_NEXT)" ] ; then
         push origin $TO_REMOTE master $MASTER_TO_NEXT
+    fi
 fi
 
 if [ "$AUTO_PUSH_BASE" != "0" ] ; then
