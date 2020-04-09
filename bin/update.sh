@@ -38,6 +38,8 @@ push () {
     FROM_REMOTE=$1
     TO_REMOTE=$2
     BRANCH=$3
+    PUSH_BRANCH=$4
+
     if [ -n "$(git branch | grep push-branch)" ]; then
         git checkout $BASE_BRANCH 
         git branch -D push-branch
@@ -48,7 +50,11 @@ push () {
        exit 1
     fi
     git checkout $FROM_REMOTE/$BRANCH -b push-branch
-    git push -f $TO_REMOTE push-branch:$BRANCH
+    if [ -z "$PUSH_BRANCH" ] ; then
+        git push -f $TO_REMOTE push-branch:$BRANCH
+    else
+        git push $TO_REMOTE push-branch:$PUSH_BRANCH
+    fi  
     git checkout $BASE_BRANCH
     git branch -D push-branch
 }
@@ -58,6 +64,15 @@ checkout_tree $BASE_TREE $BASE_BRANCH
 pushd $LOCAL_TREE
 add_remote_tree $TO_TREE $TO_REMOTE
 git fetch --all
+
+if [ -n "$MASTER_TO_NEXT" ] ; then
+    if [ -z "$(git branch -a | grep remotes\/origin/$MASTER_TO_NEXT)" ] ; then
+        push origin $TO_REMOTE master $MASTER_TO_NEXT
+    else
+        exit 1
+    fi 
+fi
+
 if [ "$AUTO_PUSH_BASE" != "0" ] ; then
     push origin $TO_REMOTE $BASE_BRANCH
 fi
@@ -110,3 +125,4 @@ if [ -n "$MANUAL_MERGE_BRANCHES" -o "$SYNC_ALL" = "1" ] ; then
        push origin github $branch
    done
 fi
+
