@@ -51,9 +51,9 @@ push () {
     fi
     git checkout $FROM_REMOTE/$BRANCH -b push-branch
     if [ -z "$PUSH_BRANCH" ] ; then
-        git push -f $TO_REMOTE push-branch:$BRANCH
+        git push -f $TO_REMOTE push-branch:refs/heads/$BRANCH
     else
-        git push $TO_REMOTE push-branch:$PUSH_BRANCH
+        git push $TO_REMOTE push-branch:refs/heads/$PUSH_BRANCH
     fi  
     git checkout $BASE_BRANCH
     git branch -D push-branch
