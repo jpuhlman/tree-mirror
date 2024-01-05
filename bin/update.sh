@@ -41,7 +41,7 @@ push () {
     PUSH_BRANCH=$4
 
     if [ -n "$(git branch | grep push-branch)" ]; then
-        rm -rf *
+        rm -rf * .git/index.lock
         git reset --hard
         git checkout $BASE_BRANCH 
         git branch -D push-branch
